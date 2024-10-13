@@ -3,12 +3,20 @@ const router = express.Router();
 const db = require('../db/connection');
 
 // Obtener todas las recetas
-router.get('/', (req, res) => {
-  db.query('SELECT * FROM Receta', (err, results) => {
-    if (err) throw err;
-    res.json(results);
+router.get('/api/recetas/:recetaId/productos', (req, res) => {
+  const recetaId = req.params.recetaId;
+
+  // Consultar los productos asociados a esa receta
+  const sql = 'SELECT producto_id, nombre, cantidad FROM ProductoReceta WHERE receta_id = ?';
+  db.query(sql, [recetaId], (err, results) => {
+      if (err) {
+          return res.status(500).json({ error: 'Error al obtener los productos de la receta' });
+      }
+      res.json(results);  // Devolver los productos asociados a la receta
   });
 });
+
+
 
 // Crear una nueva receta
 router.post('/', (req, res) => {
