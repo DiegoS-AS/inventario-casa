@@ -93,3 +93,42 @@ router.delete('/:id', (req, res) => {
 });
 
 module.exports = router;
+
+// Endpoint para obtener los productos de una receta
+router.get('/api/recetas/:recetaId/productos', (req, res) => {
+  const recetaId = req.params.recetaId;
+
+  // Supongamos que tienes la receta con los productos asociados
+  const productosReceta = [
+      { producto_id: 1, nombre: "Papa", cantidad: 2 },
+      { producto_id: 2, nombre: "Manteca", cantidad: 1 }
+  ];
+
+  res.json(productosReceta);  // Devolver los productos de la receta
+});
+
+// Endpoint para validar si hay suficiente inventario
+router.post('/api/recetas/:recetaId/validar', (req, res) => {
+  const { productos } = req.body;
+
+  // Simulación del inventario actual
+  const inventario = {
+      1: 3,  // 3 Papas
+      2: 0   // 0 Mantecas
+  };
+
+  let productosFaltantes = [];
+
+  productos.forEach(producto => {
+      const cantidadDisponible = inventario[producto.producto_id] || 0;
+      if (producto.cantidad_usada > cantidadDisponible) {
+          productosFaltantes.push(producto.producto_id);
+      }
+  });
+
+  if (productosFaltantes.length > 0) {
+      res.json({ valido: false, productosFaltantes });
+  } else {
+      res.json({ valido: true });
+  }
+});
