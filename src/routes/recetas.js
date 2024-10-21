@@ -114,4 +114,27 @@ router.post('/:recetaId/validar', (req, res) => {
     }
 });
 
+router.get('/:recetaId/productos', (req, res) => {
+    const recetaId = req.params.recetaId;
+
+    const query = `
+        SELECT p.producto_id, p.nombre, pr.cantidad_usada 
+        FROM ProductoReceta pr
+        JOIN Producto p ON pr.producto_id = p.producto_id
+        WHERE pr.receta_id = ?`;
+
+    db.query(query, [recetaId], (err, results) => {
+        if (err) {
+            console.error('Error en la consulta SQL:', err);
+            return res.status(500).json({ error: 'Error al obtener los productos de la receta' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron productos para esta receta' });
+        }
+
+        res.json(results);  // Devolver los productos asociados a la receta
+    });
+});
+
 module.exports = router;
